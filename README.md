@@ -24,3 +24,9 @@ This section describes the current software architecture of the MySawit platform
 ![Deployment Diagram](./images/deployment-diagram.png)
 
 ---
+## 2. The Future Architecture
+Based on our risk storming analysis, we modified the architecture by introducing a Message Broker (RabbitMQ) to decouple the services.
+
+![Future Container Diagram](./images/future-container-diagram.png)
+
+---
