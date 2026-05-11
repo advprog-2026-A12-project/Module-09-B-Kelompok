@@ -30,3 +30,14 @@ Based on our risk storming analysis, we modified the architecture by introducing
 ![Future Container Diagram](./images/future-container-diagram.png)
 
 ---
+## 3. Explanation of Risk Storming
+
+**Architectural Risk Analysis (Kondisi Saat Ini)**
+
+Dalam arsitektur *microservices* MySawit saat ini, grup kami mengidentifikasi adanya risiko ketersediaan (*availability risk*) dan ketergantungan yang ketat (*tight-coupling*) antar Container. Contoh kasus utamanya terjadi pada alur bisnis inti: saat Mandor menyetujui panen di `MySawit-SAWIT`, sistem harus segera membuat data penggajian di `MySawit-PAYMENT`. Jika interaksi ini dilakukan secara sinkronus (Direct HTTP Call) dan `MySawit-PAYMENT` mengalami *downtime* atau *traffic overload*, maka operasi persetujuan panen di `MySawit-SAWIT` akan ikut gagal secara beruntun (*cascading failure*). Hal ini mengancam keandalan sistem secara keseluruhan.
+
+**Architecture Modification Justification (Arsitektur Masa Depan)**
+
+Untuk memitigasi risiko tersebut, kelompok kami sepakat memodifikasi arsitektur masa depan dengan menerapkan pendekatan **Event-Driven Architecture**. Kami menyisipkan *Container* baru berupa **Message Broker (RabbitMQ)** di pusat backend MySawit.
+
+Dengan arsitektur masa depan ini, servis `SAWIT` tidak perlu lagi memanggil servis `PAYMENT` secara langsung. `SAWIT` cukup mengirimkan pesan/event (misal: *HarvestApprovedEvent*) ke RabbitMQ. Jika servis `PAYMENT` sedang bermasalah, pesan tersebut akan disimpan dengan aman di antrean RabbitMQ, dan baru akan diproses (*consumed*) saat servis `PAYMENT` kembali normal. Modifikasi ini memastikan *High Availability*, toleransi kesalahan (*fault tolerance*), dan pemisahan beban kerja yang sempurna bagi keseluruhan ekosistem MySawit.
